@@ -39,6 +39,7 @@
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.btnFilesList = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -156,6 +157,7 @@
             // 
             // btnFilesList
             // 
+            this.btnFilesList.Enabled = false;
             this.btnFilesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnFilesList.Location = new System.Drawing.Point(463, 277);
             this.btnFilesList.Name = "btnFilesList";
@@ -163,12 +165,21 @@
             this.btnFilesList.TabIndex = 10;
             this.btnFilesList.Text = "Lista fișierelor scanate";
             this.btnFilesList.UseVisualStyleBackColor = true;
+            this.btnFilesList.Click += new System.EventHandler(this.btnFilesList_Click);
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(463, 387);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(283, 42);
+            this.progressBar1.TabIndex = 11;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.btnFilesList);
             this.Controls.Add(this.checkBox4);
             this.Controls.Add(this.checkBox3);
@@ -201,6 +212,7 @@
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.Button btnFilesList;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 
