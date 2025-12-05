@@ -7,7 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace PDFContorPagini
+namespace FisiereContorPagini
 {
     public partial class Form1 : Form
     {

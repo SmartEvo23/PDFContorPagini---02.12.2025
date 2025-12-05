@@ -1,4 +1,4 @@
-﻿namespace PDFContorPagini
+﻿namespace FisiereContorPagini
 {
     partial class Form1
     {
@@ -40,7 +40,7 @@
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.btnFilesList = new System.Windows.Forms.Button();
-            this.progressBar1 = new PDFContorPagini.Controls.OverlayProgressBar();
+            this.progressBar1 = new FisiereContorPagini.Controls.OverlayProgressBar();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -214,7 +214,7 @@
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.Button btnFilesList;
-        private PDFContorPagini.Controls.OverlayProgressBar progressBar1;
+        private FisiereContorPagini.Controls.OverlayProgressBar progressBar1;
     }
 }
 
