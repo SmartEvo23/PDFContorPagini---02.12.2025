@@ -28,6 +28,16 @@ namespace PDFContorPagini
 
             // Files list button disabled until a scan with results is completed
             btnFilesList.Enabled = false;
+
+            // Set window icon (use the application's associated icon as a fallback)
+            try
+            {
+                this.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            }
+            catch
+            {
+                // ignore if icon extraction fails
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -345,6 +355,11 @@ namespace PDFContorPagini
                 listForm.Text = "Fișiere scanate";
                 listForm.StartPosition = FormStartPosition.CenterParent;
                 listForm.Size = new System.Drawing.Size(800, 600);
+
+                // show the same icon as the main window (if present)
+                listForm.ShowIcon = true;
+                if (this.Icon != null)
+                    listForm.Icon = this.Icon;
 
                 TextBox tb = new TextBox
                 {

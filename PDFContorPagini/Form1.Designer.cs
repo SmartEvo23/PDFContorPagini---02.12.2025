@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnSelectFolder = new System.Windows.Forms.Button();
             this.txtFolderPath = new System.Windows.Forms.TextBox();
             this.lblTotalPages = new System.Windows.Forms.Label();
@@ -191,6 +192,7 @@
             this.Controls.Add(this.btnSelectFolder);
             this.Controls.Add(this.chkWordFiles);
             this.Controls.Add(this.chkPdfFiles);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "FișiereContorPagini";
             this.Load += new System.EventHandler(this.Form1_Load);
