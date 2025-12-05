@@ -38,7 +38,7 @@
             this.btnSelectFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSelectFolder.Location = new System.Drawing.Point(21, 38);
             this.btnSelectFolder.Name = "btnSelectFolder";
-            this.btnSelectFolder.Size = new System.Drawing.Size(184, 42);
+            this.btnSelectFolder.Size = new System.Drawing.Size(230, 42);
             this.btnSelectFolder.TabIndex = 0;
             this.btnSelectFolder.Text = "Selectează Folder";
             this.btnSelectFolder.UseVisualStyleBackColor = true;
@@ -47,10 +47,10 @@
             // txtFolderPath
             // 
             this.txtFolderPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFolderPath.Location = new System.Drawing.Point(228, 38);
+            this.txtFolderPath.Location = new System.Drawing.Point(21, 86);
             this.txtFolderPath.Name = "txtFolderPath";
             this.txtFolderPath.ReadOnly = true;
-            this.txtFolderPath.Size = new System.Drawing.Size(500, 30);
+            this.txtFolderPath.Size = new System.Drawing.Size(767, 30);
             this.txtFolderPath.TabIndex = 1;
             // 
             // lblTotalPages
@@ -72,7 +72,7 @@
             this.Controls.Add(this.txtFolderPath);
             this.Controls.Add(this.btnSelectFolder);
             this.Name = "Form1";
-            this.Text = "PDFContorPagini";
+            this.Text = "FisiereContorPagini";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
