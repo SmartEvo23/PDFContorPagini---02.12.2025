@@ -39,7 +39,7 @@
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.btnFilesList = new System.Windows.Forms.Button();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.progressBar1 = new PDFContorPagini.Controls.OverlayProgressBar();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -212,7 +212,7 @@
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.Button btnFilesList;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private PDFContorPagini.Controls.OverlayProgressBar progressBar1;
     }
 }
 

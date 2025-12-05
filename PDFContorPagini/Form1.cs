@@ -130,6 +130,7 @@ namespace PDFContorPagini
                                 if (progressBar1.Value < progressBar1.Maximum)
                                 {
                                     progressBar1.PerformStep();
+                                    progressBar1.Invalidate();   // force redraw so custom text updates
                                     Application.DoEvents();
                                 }
                             }
@@ -194,6 +195,7 @@ namespace PDFContorPagini
                                         if (progressBar1.Value < progressBar1.Maximum)
                                         {
                                             progressBar1.PerformStep();
+                                            progressBar1.Invalidate();   // force redraw so custom text updates
                                             Application.DoEvents();
                                         }
                                     }
