@@ -19,6 +19,8 @@ namespace PDFContorPagini
         public Form1()
         {
             InitializeComponent();
+            // Ensure button state matches initial checkbox state
+            UpdateSelectButtonState();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -26,11 +28,35 @@ namespace PDFContorPagini
             // You can add any initialization code here if needed.
         }
 
+        private void FileTypeCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSelectButtonState();
+        }
+
+        private void UpdateSelectButtonState()
+        {
+            // Button enabled only when at least one file-type checkbox is checked
+            btnSelectFolder.Enabled =
+                chkPdfFiles.Checked
+                || chkWordFiles.Checked
+                || checkBox1.Checked
+                || checkBox2.Checked
+                || checkBox3.Checked
+                || checkBox4.Checked;
+        }
+
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
+            // Guard in case button clicked while no checkbox is selected
+            if (!(chkPdfFiles.Checked || chkWordFiles.Checked || checkBox1.Checked || checkBox2.Checked || checkBox3.Checked || checkBox4.Checked))
+            {
+                MessageBox.Show("Selectați cel puțin un tip de fișier înainte de a continua.", "Alege tip fișiere", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             // Folosește dialogul standard Windows pentru selectarea unui folder
             FolderBrowserDialog fbd = new FolderBrowserDialog();
-            fbd.Description = "Selectați directorul rădăcină care conține fișierele PDF.";
+            fbd.Description = "Selectați directorul rădăcină care conține fișierele selectate.";
 
             if (fbd.ShowDialog() == DialogResult.OK)
             {
