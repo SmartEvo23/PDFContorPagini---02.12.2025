@@ -2,15 +2,10 @@
 using PdfSharpCore.Pdf.IO;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using SixLabors.ImageSharp;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace PDFContorPagini
 {
@@ -65,7 +60,27 @@ namespace PDFContorPagini
 
                 try
                 {
-                    long totalPageCount = CountTotalPdfPages(rootFolderPath);
+                    long totalPageCount = 0;
+
+                    // PDF count if selected
+                    if (chkPdfFiles.Checked)
+                    {
+                        totalPageCount += CountTotalPdfPages(rootFolderPath);
+                    }
+
+                    // Word-related types: map checkboxes to extensions
+                    var wordExtensions = new List<string>();
+                    if (chkWordFiles.Checked) wordExtensions.Add(".docx");
+                    if (checkBox1.Checked) wordExtensions.Add(".doc");
+                    if (checkBox2.Checked) wordExtensions.Add(".docm");
+                    if (checkBox3.Checked) wordExtensions.Add(".dotx");
+                    if (checkBox4.Checked) wordExtensions.Add(".dot");
+
+                    if (wordExtensions.Count > 0)
+                    {
+                        totalPageCount += CountTotalWordPages(rootFolderPath, wordExtensions);
+                    }
+
                     lblTotalPages.Text = $"Total pagini: {totalPageCount}";
                     MessageBox.Show($"Calcul finalizat. Total pagini: {totalPageCount}", "Succes");
                 }
@@ -81,15 +96,12 @@ namespace PDFContorPagini
             long totalPages = 0;
 
             // Caută toate fișierele .pdf recursiv (în subfoldere)
-            // Folosim SearchOption.AllDirectories
             string[] pdfFiles = Directory.GetFiles(rootDirectoryPath, "*.pdf", SearchOption.AllDirectories);
 
             foreach (string file in pdfFiles)
             {
                 try
                 {
-                    // Deschide fișierul PDF folosind PDFsharp
-                    // Modul PdfDocumentOpenMode.ReadOnly este eficient
                     using (PdfDocument document = PdfReader.Open(file, PdfDocumentOpenMode.ReadOnly))
                     {
                         totalPages += document.PageCount;
@@ -97,9 +109,82 @@ namespace PDFContorPagini
                 }
                 catch (Exception ex)
                 {
-                    // Ignoră fișierele corupte sau protejate cu parolă și raportează eroarea
                     Console.WriteLine($"Eroare la citirea fișierului {Path.GetFileName(file)}: {ex.Message}");
-                    // Puteți adăuga o logare mai detaliată aici dacă doriți
+                }
+            }
+
+            return totalPages;
+        }
+
+        private long CountTotalWordPages(string rootDirectoryPath, IEnumerable<string> extensions)
+        {
+            long totalPages = 0;
+
+            // Collect files for the requested extensions
+            var files = new List<string>();
+            foreach (var ext in extensions.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                string pattern = "*" + ext;
+                files.AddRange(Directory.GetFiles(rootDirectoryPath, pattern, SearchOption.AllDirectories));
+            }
+
+            if (files.Count == 0)
+                return 0;
+
+            Word.Application wordApp = null;
+            try
+            {
+                wordApp = new Word.Application();
+                wordApp.Visible = false;
+
+                object missing = Type.Missing;
+                foreach (var file in files)
+                {
+                    Word.Document doc = null;
+                    object fileName = file;
+                    object readOnly = true;
+                    object isVisible = false;
+
+                    try
+                    {
+                        // Open document in read-only, invisible mode
+                        doc = wordApp.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing,
+                                                     ref missing, ref missing, ref missing, ref missing, ref missing,
+                                                     ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                        // ComputeStatistics returns page count
+                        int pages = doc.ComputeStatistics(Word.WdStatistic.wdStatisticPages, false);
+                        totalPages += pages;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Eroare la citirea fișierului Word {Path.GetFileName(file)}: {ex.Message}");
+                    }
+                    finally
+                    {
+                        if (doc != null)
+                        {
+                            try
+                            {
+                                object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
+                                doc.Close(ref saveChanges, ref missing, ref missing);
+                            }
+                            catch { }
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (wordApp != null)
+                {
+                    try
+                    {
+                        object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
+                        wordApp.Quit(ref saveChanges, Type.Missing, Type.Missing);
+                    }
+                    catch { }
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApp);
                 }
             }
 

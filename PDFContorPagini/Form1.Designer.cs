@@ -38,6 +38,7 @@
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.btnFilesList = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -46,9 +47,9 @@
             this.btnSelectFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSelectFolder.Location = new System.Drawing.Point(21, 277);
             this.btnSelectFolder.Name = "btnSelectFolder";
-            this.btnSelectFolder.Size = new System.Drawing.Size(184, 42);
+            this.btnSelectFolder.Size = new System.Drawing.Size(207, 42);
             this.btnSelectFolder.TabIndex = 2;
-            this.btnSelectFolder.Text = "Selectează Folder";
+            this.btnSelectFolder.Text = "Selectează locația";
             this.btnSelectFolder.UseVisualStyleBackColor = true;
             this.btnSelectFolder.Click += new System.EventHandler(this.btnSelectFolder_Click);
             // 
@@ -153,11 +154,22 @@
             this.checkBox4.UseVisualStyleBackColor = true;
             this.checkBox4.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
             // 
+            // btnFilesList
+            // 
+            this.btnFilesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnFilesList.Location = new System.Drawing.Point(463, 277);
+            this.btnFilesList.Name = "btnFilesList";
+            this.btnFilesList.Size = new System.Drawing.Size(283, 42);
+            this.btnFilesList.TabIndex = 10;
+            this.btnFilesList.Text = "Lista fișierelor scanate";
+            this.btnFilesList.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnFilesList);
             this.Controls.Add(this.checkBox4);
             this.Controls.Add(this.checkBox3);
             this.Controls.Add(this.checkBox2);
@@ -188,6 +200,7 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.CheckBox checkBox4;
+        private System.Windows.Forms.Button btnFilesList;
     }
 }
 
