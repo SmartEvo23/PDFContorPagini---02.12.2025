@@ -1,4 +1,4 @@
-﻿namespace FisiereContorPagini
+namespace FisiereContorPagini
 {
     partial class Form1
     {
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnSelectFolder = new System.Windows.Forms.Button();
             this.txtFolderPath = new System.Windows.Forms.TextBox();
@@ -41,11 +42,16 @@
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.btnFilesList = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.btnHelp = new System.Windows.Forms.Button();
+            this.lblPricePerPage = new System.Windows.Forms.Label();
+            this.numPricePerPage = new System.Windows.Forms.NumericUpDown();
+            this.lblTotalCost = new System.Windows.Forms.Label();
             this.progressBar1 = new FisiereContorPagini.Controls.OverlayProgressBar();
+            ((System.ComponentModel.ISupportInitialize)(this.numPricePerPage)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // btnSelectFolder
-            // 
+            //
             this.btnSelectFolder.Enabled = false;
             this.btnSelectFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSelectFolder.Location = new System.Drawing.Point(21, 277);
@@ -70,16 +76,16 @@
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             //
             // txtFolderPath
-            // 
+            //
             this.txtFolderPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtFolderPath.Location = new System.Drawing.Point(21, 334);
             this.txtFolderPath.Name = "txtFolderPath";
             this.txtFolderPath.ReadOnly = true;
             this.txtFolderPath.Size = new System.Drawing.Size(750, 30);
             this.txtFolderPath.TabIndex = 3;
-            // 
+            //
             // lblTotalPages
-            // 
+            //
             this.lblTotalPages.AutoSize = true;
             this.lblTotalPages.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotalPages.Location = new System.Drawing.Point(27, 387);
@@ -87,9 +93,9 @@
             this.lblTotalPages.Size = new System.Drawing.Size(135, 25);
             this.lblTotalPages.TabIndex = 4;
             this.lblTotalPages.Text = "Total pagini: 0";
-            // 
+            //
             // chkPdfFiles
-            // 
+            //
             this.chkPdfFiles.AutoSize = true;
             this.chkPdfFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkPdfFiles.Location = new System.Drawing.Point(21, 60);
@@ -99,9 +105,9 @@
             this.chkPdfFiles.Text = ".pdf";
             this.chkPdfFiles.UseVisualStyleBackColor = true;
             this.chkPdfFiles.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
-            // 
+            //
             // chkWordFiles
-            // 
+            //
             this.chkWordFiles.AutoSize = true;
             this.chkWordFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkWordFiles.Location = new System.Drawing.Point(21, 95);
@@ -111,9 +117,9 @@
             this.chkWordFiles.Text = ".docx (document standard > 2007)";
             this.chkWordFiles.UseVisualStyleBackColor = true;
             this.chkWordFiles.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(16, 23);
@@ -121,9 +127,9 @@
             this.label1.Size = new System.Drawing.Size(150, 25);
             this.label1.TabIndex = 5;
             this.label1.Text = "Tipuri de fișiere:";
-            // 
+            //
             // checkBox1
-            // 
+            //
             this.checkBox1.AutoSize = true;
             this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox1.Location = new System.Drawing.Point(21, 130);
@@ -133,9 +139,9 @@
             this.checkBox1.Text = ".doc (format vechi < 2007)";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
-            // 
+            //
             // checkBox2
-            // 
+            //
             this.checkBox2.AutoSize = true;
             this.checkBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox2.Location = new System.Drawing.Point(21, 165);
@@ -145,9 +151,9 @@
             this.checkBox2.Text = ".docm (document cu macrocomenzi VBA)";
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
-            // 
+            //
             // checkBox3
-            // 
+            //
             this.checkBox3.AutoSize = true;
             this.checkBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox3.Location = new System.Drawing.Point(21, 200);
@@ -157,9 +163,9 @@
             this.checkBox3.Text = ".dotx (șablon > 2007)";
             this.checkBox3.UseVisualStyleBackColor = true;
             this.checkBox3.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
-            // 
+            //
             // checkBox4
-            // 
+            //
             this.checkBox4.AutoSize = true;
             this.checkBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox4.Location = new System.Drawing.Point(21, 235);
@@ -169,9 +175,9 @@
             this.checkBox4.Text = ".dot (șablon vechi < 2007)";
             this.checkBox4.UseVisualStyleBackColor = true;
             this.checkBox4.CheckedChanged += new System.EventHandler(this.FileTypeCheckbox_CheckedChanged);
-            // 
+            //
             // btnFilesList
-            // 
+            //
             this.btnFilesList.Enabled = false;
             this.btnFilesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnFilesList.Location = new System.Drawing.Point(463, 277);
@@ -181,19 +187,66 @@
             this.btnFilesList.Text = "Lista fișierelor scanate";
             this.btnFilesList.UseVisualStyleBackColor = true;
             this.btnFilesList.Click += new System.EventHandler(this.btnFilesList_Click);
-            // 
+            //
+            // btnHelp
+            //
+            this.btnHelp.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHelp.Location = new System.Drawing.Point(697, 15);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(80, 36);
+            this.btnHelp.TabIndex = 13;
+            this.btnHelp.Text = "Ajutor";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
+            //
+            // lblPricePerPage
+            //
+            this.lblPricePerPage.AutoSize = true;
+            this.lblPricePerPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPricePerPage.Location = new System.Drawing.Point(27, 429);
+            this.lblPricePerPage.Name = "lblPricePerPage";
+            this.lblPricePerPage.Size = new System.Drawing.Size(180, 25);
+            this.lblPricePerPage.TabIndex = 14;
+            this.lblPricePerPage.Text = "Preț per pagină (lei):";
+            //
+            // numPricePerPage
+            //
+            this.numPricePerPage.DecimalPlaces = 2;
+            this.numPricePerPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numPricePerPage.Increment = new decimal(new int[] { 5, 0, 0, 131072 });
+            this.numPricePerPage.Location = new System.Drawing.Point(213, 425);
+            this.numPricePerPage.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            this.numPricePerPage.Name = "numPricePerPage";
+            this.numPricePerPage.Size = new System.Drawing.Size(100, 32);
+            this.numPricePerPage.TabIndex = 15;
+            this.numPricePerPage.ValueChanged += new System.EventHandler(this.numPricePerPage_ValueChanged);
+            //
+            // lblTotalCost
+            //
+            this.lblTotalCost.AutoSize = true;
+            this.lblTotalCost.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTotalCost.Location = new System.Drawing.Point(330, 429);
+            this.lblTotalCost.Name = "lblTotalCost";
+            this.lblTotalCost.Size = new System.Drawing.Size(220, 25);
+            this.lblTotalCost.TabIndex = 16;
+            this.lblTotalCost.Text = "Total de plată: 0,00 lei";
+            //
             // progressBar1
-            // 
+            //
             this.progressBar1.Location = new System.Drawing.Point(463, 387);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(283, 42);
             this.progressBar1.TabIndex = 11;
-            // 
+            //
             // Form1
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 490);
+            this.Controls.Add(this.lblTotalCost);
+            this.Controls.Add(this.numPricePerPage);
+            this.Controls.Add(this.lblPricePerPage);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnFilesList);
@@ -211,6 +264,7 @@
             this.Name = "Form1";
             this.Text = "FișiereContorPagini";
             this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.numPricePerPage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -230,7 +284,10 @@
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.Button btnFilesList;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Button btnHelp;
+        private System.Windows.Forms.Label lblPricePerPage;
+        private System.Windows.Forms.NumericUpDown numPricePerPage;
+        private System.Windows.Forms.Label lblTotalCost;
         private FisiereContorPagini.Controls.OverlayProgressBar progressBar1;
     }
 }
-
