@@ -47,9 +47,6 @@ namespace FisiereContorPagini
         private readonly List<FilePageInfo> scannedFiles = new List<FilePageInfo>();
         private readonly List<FileErrorInfo> failedFiles = new List<FileErrorInfo>();
 
-        // Total pages from the last completed scan; used by the cost calculator
-        private long lastTotalPages = 0;
-
         // Non-null while a scan is running; used to cancel it from btnCancel_Click
         private CancellationTokenSource scanCts;
 
@@ -64,8 +61,6 @@ namespace FisiereContorPagini
 
 5. Din aceeași fereastră poți apăsa ""Export CSV"" ca să salvezi rezultatul într-un fișier pe care îl poți deschide ulterior în Excel.
 
-6. Completează ""Preț per pagină"" (lângă totalul de pagini) ca aplicația să calculeze automat totalul de plată.
-
 Observații:
 - Numărarea paginilor din fișiere Word necesită Microsoft Word instalat pe acest calculator.
 - Fișierele care nu pot fi citite (corupte, protejate cu parolă etc.) apar în lista de fișiere cu mesajul de eroare exact, nu sunt ignorate silențios.";
@@ -78,8 +73,6 @@ Observații:
 
             // Files list button disabled until a scan with results is completed
             btnFilesList.Enabled = false;
-
-            UpdateTotalCost();
 
             // Set window icon (use the application's associated icon as a fallback)
             try
@@ -199,9 +192,7 @@ Observații:
 
             scannedFiles.Clear();
             failedFiles.Clear();
-            lastTotalPages = 0;
             lblTotalPages.Text = "Total pagini: 0";
-            UpdateTotalCost();
 
             scanCts = new CancellationTokenSource();
             SetScanningState(true);
@@ -225,10 +216,8 @@ Observații:
 
                 scannedFiles.AddRange(result.Files);
                 failedFiles.AddRange(result.Errors);
-                lastTotalPages = result.TotalPages;
 
                 lblTotalPages.Text = $"Total pagini: {result.TotalPages:N0}";
-                UpdateTotalCost();
                 btnFilesList.Enabled = scannedFiles.Count > 0 || failedFiles.Count > 0;
 
                 progressBar1.Value = progressBar1.Maximum;
@@ -243,9 +232,7 @@ Observații:
             }
             catch (OperationCanceledException)
             {
-                lastTotalPages = 0;
                 lblTotalPages.Text = "Total pagini: 0";
-                UpdateTotalCost();
                 MessageBox.Show("Scanare anulată.", "Anulat", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -264,17 +251,6 @@ Observații:
         {
             btnCancel.Enabled = false; // avoid multiple clicks while the scan winds down
             scanCts?.Cancel();
-        }
-
-        private void numPricePerPage_ValueChanged(object sender, EventArgs e)
-        {
-            UpdateTotalCost();
-        }
-
-        private void UpdateTotalCost()
-        {
-            decimal cost = lastTotalPages * numPricePerPage.Value;
-            lblTotalCost.Text = $"Total de plată: {cost:N2} lei";
         }
 
         private void btnHelp_Click(object sender, EventArgs e)

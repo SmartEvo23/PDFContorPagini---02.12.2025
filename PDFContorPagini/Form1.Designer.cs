@@ -43,11 +43,7 @@ namespace FisiereContorPagini
             this.btnFilesList = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnHelp = new System.Windows.Forms.Button();
-            this.lblPricePerPage = new System.Windows.Forms.Label();
-            this.numPricePerPage = new System.Windows.Forms.NumericUpDown();
-            this.lblTotalCost = new System.Windows.Forms.Label();
             this.progressBar1 = new FisiereContorPagini.Controls.OverlayProgressBar();
-            ((System.ComponentModel.ISupportInitialize)(this.numPricePerPage)).BeginInit();
             this.SuspendLayout();
             //
             // btnSelectFolder
@@ -199,38 +195,6 @@ namespace FisiereContorPagini
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             //
-            // lblPricePerPage
-            //
-            this.lblPricePerPage.AutoSize = true;
-            this.lblPricePerPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPricePerPage.Location = new System.Drawing.Point(27, 429);
-            this.lblPricePerPage.Name = "lblPricePerPage";
-            this.lblPricePerPage.Size = new System.Drawing.Size(180, 25);
-            this.lblPricePerPage.TabIndex = 14;
-            this.lblPricePerPage.Text = "Preț per pagină (lei):";
-            //
-            // numPricePerPage
-            //
-            this.numPricePerPage.DecimalPlaces = 2;
-            this.numPricePerPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.numPricePerPage.Increment = new decimal(new int[] { 5, 0, 0, 131072 });
-            this.numPricePerPage.Location = new System.Drawing.Point(213, 425);
-            this.numPricePerPage.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
-            this.numPricePerPage.Name = "numPricePerPage";
-            this.numPricePerPage.Size = new System.Drawing.Size(100, 32);
-            this.numPricePerPage.TabIndex = 15;
-            this.numPricePerPage.ValueChanged += new System.EventHandler(this.numPricePerPage_ValueChanged);
-            //
-            // lblTotalCost
-            //
-            this.lblTotalCost.AutoSize = true;
-            this.lblTotalCost.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTotalCost.Location = new System.Drawing.Point(330, 429);
-            this.lblTotalCost.Name = "lblTotalCost";
-            this.lblTotalCost.Size = new System.Drawing.Size(220, 25);
-            this.lblTotalCost.TabIndex = 16;
-            this.lblTotalCost.Text = "Total de plată: 0,00 lei";
-            //
             // progressBar1
             //
             this.progressBar1.Location = new System.Drawing.Point(463, 387);
@@ -242,10 +206,7 @@ namespace FisiereContorPagini
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 490);
-            this.Controls.Add(this.lblTotalCost);
-            this.Controls.Add(this.numPricePerPage);
-            this.Controls.Add(this.lblPricePerPage);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.btnCancel);
@@ -264,7 +225,6 @@ namespace FisiereContorPagini
             this.Name = "Form1";
             this.Text = "FișiereContorPagini";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.numPricePerPage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -285,9 +245,6 @@ namespace FisiereContorPagini
         private System.Windows.Forms.Button btnFilesList;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnHelp;
-        private System.Windows.Forms.Label lblPricePerPage;
-        private System.Windows.Forms.NumericUpDown numPricePerPage;
-        private System.Windows.Forms.Label lblTotalCost;
         private FisiereContorPagini.Controls.OverlayProgressBar progressBar1;
     }
 }

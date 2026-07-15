@@ -22,9 +22,7 @@ Pentru numărarea fișierelor Word (.doc, .docx, .docm, .dotx, .dot) este necesa
 
 6. Din aceeași fereastră, butonul **"Export CSV"** salvează rezultatul într-un fișier `.csv` pe care îl poți deschide direct în Excel.
 
-7. **Calculator de cost:** completează câmpul "Preț per pagină (lei)" de lângă totalul de pagini — aplicația calculează automat "Total de plată" (pagini × preț).
-
-8. Butonul **"Ajutor"** din colțul din dreapta sus deschide oricând acest ghid direct din aplicație.
+7. Butonul **"Ajutor"** din colțul din dreapta sus deschide oricând acest ghid direct din aplicație.
 
 ## Întrebări frecvente
 
