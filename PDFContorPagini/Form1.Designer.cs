@@ -40,6 +40,7 @@
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.btnFilesList = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.progressBar1 = new FisiereContorPagini.Controls.OverlayProgressBar();
             this.SuspendLayout();
             // 
@@ -54,7 +55,20 @@
             this.btnSelectFolder.Text = "Selectează locația";
             this.btnSelectFolder.UseVisualStyleBackColor = true;
             this.btnSelectFolder.Click += new System.EventHandler(this.btnSelectFolder_Click);
-            // 
+            //
+            // btnCancel
+            //
+            this.btnCancel.Enabled = false;
+            this.btnCancel.Visible = false;
+            this.btnCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancel.Location = new System.Drawing.Point(240, 277);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(207, 42);
+            this.btnCancel.TabIndex = 12;
+            this.btnCancel.Text = "Anulează scanarea";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            //
             // txtFolderPath
             // 
             this.txtFolderPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -181,6 +195,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnFilesList);
             this.Controls.Add(this.checkBox4);
             this.Controls.Add(this.checkBox3);
@@ -214,6 +229,7 @@
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.Button btnFilesList;
+        private System.Windows.Forms.Button btnCancel;
         private FisiereContorPagini.Controls.OverlayProgressBar progressBar1;
     }
 }

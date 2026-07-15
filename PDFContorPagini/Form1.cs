@@ -1,9 +1,11 @@
-﻿using PdfSharpCore.Pdf;
+using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Word = Microsoft.Office.Interop.Word;
 
@@ -18,7 +20,26 @@ namespace FisiereContorPagini
             public long PageCount { get; set; }
         }
 
+        // Holds a file that failed to be read, with the reason
+        private class FileErrorInfo
+        {
+            public string FilePath { get; set; }
+            public string Message { get; set; }
+        }
+
+        // Result of a background scan
+        private class ScanResult
+        {
+            public List<FilePageInfo> Files { get; } = new List<FilePageInfo>();
+            public List<FileErrorInfo> Errors { get; } = new List<FileErrorInfo>();
+            public long TotalPages { get; set; }
+        }
+
         private readonly List<FilePageInfo> scannedFiles = new List<FilePageInfo>();
+        private readonly List<FileErrorInfo> failedFiles = new List<FileErrorInfo>();
+
+        // Non-null while a scan is running; used to cancel it from btnCancel_Click
+        private CancellationTokenSource scanCts;
 
         public Form1()
         {
@@ -53,16 +74,39 @@ namespace FisiereContorPagini
         private void UpdateSelectButtonState()
         {
             // Button enabled only when at least one file-type checkbox is checked
+            // (and no scan is currently in progress)
             btnSelectFolder.Enabled =
-                chkPdfFiles.Checked
+                scanCts == null &&
+                (chkPdfFiles.Checked
                 || chkWordFiles.Checked
                 || checkBox1.Checked
                 || checkBox2.Checked
                 || checkBox3.Checked
-                || checkBox4.Checked;
+                || checkBox4.Checked);
         }
 
-        private void btnSelectFolder_Click(object sender, EventArgs e)
+        // Enables/disables the controls that shouldn't be touched while a scan is running
+        private void SetScanningState(bool isScanning)
+        {
+            chkPdfFiles.Enabled = !isScanning;
+            chkWordFiles.Enabled = !isScanning;
+            checkBox1.Enabled = !isScanning;
+            checkBox2.Enabled = !isScanning;
+            checkBox3.Enabled = !isScanning;
+            checkBox4.Enabled = !isScanning;
+
+            btnCancel.Visible = isScanning;
+            btnCancel.Enabled = isScanning;
+
+            if (isScanning)
+            {
+                btnFilesList.Enabled = false;
+            }
+
+            UpdateSelectButtonState();
+        }
+
+        private async void btnSelectFolder_Click(object sender, EventArgs e)
         {
             // Guard in case button clicked while no checkbox is selected
             if (!(chkPdfFiles.Checked || chkWordFiles.Checked || checkBox1.Checked || checkBox2.Checked || checkBox3.Checked || checkBox4.Checked))
@@ -75,270 +119,240 @@ namespace FisiereContorPagini
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             fbd.Description = "Selectați directorul rădăcină care conține fișierele selectate.";
 
-            if (fbd.ShowDialog() == DialogResult.OK)
+            if (fbd.ShowDialog() != DialogResult.OK)
             {
-                string rootFolderPath = fbd.SelectedPath;
-                txtFolderPath.Text = rootFolderPath; // Afișează calea selectată
+                return;
+            }
 
-                try
+            string rootFolderPath = fbd.SelectedPath;
+            txtFolderPath.Text = rootFolderPath; // Afișează calea selectată
+
+            // Build the extension list for Word-family files
+            var wordExtensions = new List<string>();
+            if (chkWordFiles.Checked) wordExtensions.Add(".docx");
+            if (checkBox1.Checked) wordExtensions.Add(".doc");
+            if (checkBox2.Checked) wordExtensions.Add(".docm");
+            if (checkBox3.Checked) wordExtensions.Add(".dotx");
+            if (checkBox4.Checked) wordExtensions.Add(".dot");
+            bool includePdf = chkPdfFiles.Checked;
+
+            string[] pdfFiles;
+            List<string> wordFiles;
+
+            try
+            {
+                // Single enumeration of the folder tree (no re-scanning later for progress vs. processing)
+                pdfFiles = includePdf
+                    ? Directory.GetFiles(rootFolderPath, "*.pdf", SearchOption.AllDirectories)
+                    : Array.Empty<string>();
+
+                wordFiles = new List<string>();
+                foreach (var ext in wordExtensions.Distinct(StringComparer.OrdinalIgnoreCase))
                 {
-                    // Clear any previous scan results
-                    scannedFiles.Clear();
-
-                    // Build list of files to process so we can drive the progress bar
-                    var allFiles = new List<string>();
-
-                    if (chkPdfFiles.Checked)
-                    {
-                        allFiles.AddRange(Directory.GetFiles(rootFolderPath, "*.pdf", SearchOption.AllDirectories));
-                    }
-
-                    var wordExtensions = new List<string>();
-                    if (chkWordFiles.Checked) wordExtensions.Add(".docx");
-                    if (checkBox1.Checked) wordExtensions.Add(".doc");
-                    if (checkBox2.Checked) wordExtensions.Add(".docm");
-                    if (checkBox3.Checked) wordExtensions.Add(".dotx");
-                    if (checkBox4.Checked) wordExtensions.Add(".dot");
-
-                    if (wordExtensions.Count > 0)
-                    {
-                        foreach (var ext in wordExtensions.Distinct(StringComparer.OrdinalIgnoreCase))
-                        {
-                            string pattern = "*" + ext;
-                            allFiles.AddRange(Directory.GetFiles(rootFolderPath, pattern, SearchOption.AllDirectories));
-                        }
-                    }
-
-                    // Initialize progress bar
-                    progressBar1.Minimum = 0;
-                    progressBar1.Value = 0;
-                    progressBar1.Step = 1;
-                    progressBar1.Maximum = Math.Max(1, allFiles.Count); // avoid Maximum 0
-
-                    long totalPageCount = 0;
-
-                    // Process PDF files (synchronously on UI thread; update progress and call DoEvents so UI updates)
-                    if (chkPdfFiles.Checked)
-                    {
-                        string[] pdfFiles = Directory.GetFiles(rootFolderPath, "*.pdf", SearchOption.AllDirectories);
-                        foreach (string file in pdfFiles)
-                        {
-                            try
-                            {
-                                using (PdfDocument document = PdfReader.Open(file, PdfDocumentOpenMode.ReadOnly))
-                                {
-                                    totalPageCount += document.PageCount;
-                                    scannedFiles.Add(new FilePageInfo { FilePath = file, PageCount = document.PageCount });
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Eroare la citirea fișierului {Path.GetFileName(file)}: {ex.Message}");
-                            }
-                            finally
-                            {
-                                if (progressBar1.Value < progressBar1.Maximum)
-                                {
-                                    progressBar1.PerformStep();
-                                    progressBar1.Invalidate();   // force redraw so custom text updates
-                                    Application.DoEvents();
-                                }
-                            }
-                        }
-                    }
-
-                    // Process Word files. We open Word once and iterate through files.
-                    if (wordExtensions.Count > 0)
-                    {
-                        // Collect word files again (to preserve previous behavior)
-                        var files = new List<string>();
-                        foreach (var ext in wordExtensions.Distinct(StringComparer.OrdinalIgnoreCase))
-                        {
-                            string pattern = "*" + ext;
-                            files.AddRange(Directory.GetFiles(rootFolderPath, pattern, SearchOption.AllDirectories));
-                        }
-
-                        if (files.Count > 0)
-                        {
-                            Word.Application wordApp = null;
-                            try
-                            {
-                                wordApp = new Word.Application();
-                                wordApp.Visible = false;
-
-                                object missing = Type.Missing;
-                                foreach (var file in files)
-                                {
-                                    Word.Document doc = null;
-                                    object fileName = file;
-                                    object readOnly = true;
-                                    object isVisible = false;
-
-                                    try
-                                    {
-                                        // Open document in read-only, invisible mode
-                                        doc = wordApp.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing,
-                                                                     ref missing, ref missing, ref missing, ref missing, ref missing,
-                                                                     ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
-                                        // ComputeStatistics returns page count
-                                        int pages = doc.ComputeStatistics(Word.WdStatistic.wdStatisticPages, false);
-                                        totalPageCount += pages;
-                                        scannedFiles.Add(new FilePageInfo { FilePath = file, PageCount = pages });
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"Eroare la citirea fișierului Word {Path.GetFileName(file)}: {ex.Message}");
-                                    }
-                                    finally
-                                    {
-                                        if (doc != null)
-                                        {
-                                            try
-                                            {
-                                                object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
-                                                doc.Close(ref saveChanges, ref missing, ref missing);
-                                            }
-                                            catch { }
-                                            System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
-                                        }
-
-                                        if (progressBar1.Value < progressBar1.Maximum)
-                                        {
-                                            progressBar1.PerformStep();
-                                            progressBar1.Invalidate();   // force redraw so custom text updates
-                                            Application.DoEvents();
-                                        }
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                if (wordApp != null)
-                                {
-                                    try
-                                    {
-                                        object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
-                                        wordApp.Quit(ref saveChanges, Type.Missing, Type.Missing);
-                                    }
-                                    catch { }
-                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApp);
-                                }
-                            }
-                        }
-                    }
-
-                    lblTotalPages.Text = $"Total pagini: {totalPageCount}";
-
-                    // Enable the files-list button only if we have scanned files
-                    btnFilesList.Enabled = scannedFiles.Count > 0;
-
-                    MessageBox.Show($"Calcul finalizat. Total pagini: {totalPageCount}", "Succes");
+                    wordFiles.AddRange(Directory.GetFiles(rootFolderPath, "*" + ext, SearchOption.AllDirectories));
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"A apărut o eroare la citirea folderului: {ex.Message}", "Eroare Majoră");
+                return;
+            }
+
+            int totalCount = pdfFiles.Length + wordFiles.Count;
+
+            // Initialize progress bar
+            progressBar1.Minimum = 0;
+            progressBar1.Value = 0;
+            progressBar1.Maximum = Math.Max(1, totalCount); // avoid Maximum 0
+            progressBar1.Invalidate();
+
+            scannedFiles.Clear();
+            failedFiles.Clear();
+            lblTotalPages.Text = "Total pagini: 0";
+
+            scanCts = new CancellationTokenSource();
+            SetScanningState(true);
+
+            var progress = new Progress<int>(processedCount =>
+            {
+                if (progressBar1.Value < progressBar1.Maximum)
                 {
-                    MessageBox.Show($"A apărut o eroare: {ex.Message}", "Eroare Majoră");
+                    progressBar1.Value = Math.Min(processedCount, progressBar1.Maximum);
+                    progressBar1.Invalidate(); // force redraw so custom text updates
                 }
+            });
+
+            try
+            {
+                ScanResult result = await RunOnStaThreadAsync(
+                    () => ScanFiles(pdfFiles, wordFiles, progress, scanCts.Token),
+                    scanCts.Token);
+
+                scannedFiles.AddRange(result.Files);
+                failedFiles.AddRange(result.Errors);
+
+                lblTotalPages.Text = $"Total pagini: {result.TotalPages}";
+                btnFilesList.Enabled = scannedFiles.Count > 0;
+
+                progressBar1.Value = progressBar1.Maximum;
+                progressBar1.Invalidate();
+
+                string message = $"Calcul finalizat. Total pagini: {result.TotalPages}.";
+                if (failedFiles.Count > 0)
+                {
+                    message += $"\n{failedFiles.Count} fișier(e) nu au putut fi citite — vezi \"{btnFilesList.Text}\" pentru detalii.";
+                }
+                MessageBox.Show(message, "Succes");
+            }
+            catch (OperationCanceledException)
+            {
+                lblTotalPages.Text = "Total pagini: 0";
+                MessageBox.Show("Scanare anulată.", "Anulat", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"A apărut o eroare: {ex.Message}", "Eroare Majoră");
+            }
+            finally
+            {
+                scanCts?.Dispose();
+                scanCts = null;
+                SetScanningState(false);
             }
         }
 
-        private long CountTotalPdfPages(string rootDirectoryPath)
+        private void btnCancel_Click(object sender, EventArgs e)
         {
-            long totalPages = 0;
+            btnCancel.Enabled = false; // avoid multiple clicks while the scan winds down
+            scanCts?.Cancel();
+        }
 
-            // Caută toate fișierele .pdf recursiv (în subfoldere)
-            string[] pdfFiles = Directory.GetFiles(rootDirectoryPath, "*.pdf", SearchOption.AllDirectories);
+        // Runs the given function on a dedicated STA thread and returns its result as a Task.
+        // Word Automation (COM interop) is happiest when driven from an STA thread rather than
+        // the default (MTA) thread pool, so we spin up our own thread instead of using Task.Run.
+        private static Task<T> RunOnStaThreadAsync<T>(Func<T> work, CancellationToken cancellationToken)
+        {
+            var tcs = new TaskCompletionSource<T>();
+
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    T result = work();
+                    tcs.TrySetResult(result);
+                }
+                catch (OperationCanceledException)
+                {
+                    tcs.TrySetCanceled(cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    tcs.TrySetException(ex);
+                }
+            });
+            thread.IsBackground = true;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+
+            return tcs.Task;
+        }
+
+        // Runs entirely on the background STA thread — must not touch any UI controls directly.
+        private ScanResult ScanFiles(string[] pdfFiles, List<string> wordFiles, IProgress<int> progress, CancellationToken token)
+        {
+            var result = new ScanResult();
+            int processed = 0;
 
             foreach (string file in pdfFiles)
             {
+                token.ThrowIfCancellationRequested();
                 try
                 {
                     using (PdfDocument document = PdfReader.Open(file, PdfDocumentOpenMode.ReadOnly))
                     {
-                        totalPages += document.PageCount;
+                        result.TotalPages += document.PageCount;
+                        result.Files.Add(new FilePageInfo { FilePath = file, PageCount = document.PageCount });
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Eroare la citirea fișierului {Path.GetFileName(file)}: {ex.Message}");
+                    result.Errors.Add(new FileErrorInfo { FilePath = file, Message = ex.Message });
+                }
+                finally
+                {
+                    processed++;
+                    progress.Report(processed);
                 }
             }
 
-            return totalPages;
-        }
-
-        private long CountTotalWordPages(string rootDirectoryPath, IEnumerable<string> extensions)
-        {
-            long totalPages = 0;
-
-            // Collect files for the requested extensions
-            var files = new List<string>();
-            foreach (var ext in extensions.Distinct(StringComparer.OrdinalIgnoreCase))
+            if (wordFiles.Count > 0)
             {
-                string pattern = "*" + ext;
-                files.AddRange(Directory.GetFiles(rootDirectoryPath, pattern, SearchOption.AllDirectories));
-            }
-
-            if (files.Count == 0)
-                return 0;
-
-            Word.Application wordApp = null;
-            try
-            {
-                wordApp = new Word.Application();
-                wordApp.Visible = false;
-
-                object missing = Type.Missing;
-                foreach (var file in files)
+                Word.Application wordApp = null;
+                try
                 {
-                    Word.Document doc = null;
-                    object fileName = file;
-                    object readOnly = true;
-                    object isVisible = false;
+                    wordApp = new Word.Application();
+                    wordApp.Visible = false;
 
-                    try
+                    object missing = Type.Missing;
+                    foreach (var file in wordFiles)
                     {
-                        // Open document in read-only, invisible mode
-                        doc = wordApp.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing,
-                                                     ref missing, ref missing, ref missing, ref missing, ref missing,
-                                                     ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
-                        // ComputeStatistics returns page count
-                        int pages = doc.ComputeStatistics(Word.WdStatistic.wdStatisticPages, false);
-                        totalPages += pages;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Eroare la citirea fișierului Word {Path.GetFileName(file)}: {ex.Message}");
-                    }
-                    finally
-                    {
-                        if (doc != null)
+                        token.ThrowIfCancellationRequested();
+
+                        Word.Document doc = null;
+                        object fileName = file;
+                        object readOnly = true;
+                        object isVisible = false;
+
+                        try
                         {
-                            try
+                            // Open document in read-only, invisible mode
+                            doc = wordApp.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing,
+                                                         ref missing, ref missing, ref missing, ref missing, ref missing,
+                                                         ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                            // ComputeStatistics returns page count
+                            int pages = doc.ComputeStatistics(Word.WdStatistic.wdStatisticPages, false);
+                            result.TotalPages += pages;
+                            result.Files.Add(new FilePageInfo { FilePath = file, PageCount = pages });
+                        }
+                        catch (Exception ex)
+                        {
+                            result.Errors.Add(new FileErrorInfo { FilePath = file, Message = ex.Message });
+                        }
+                        finally
+                        {
+                            if (doc != null)
                             {
-                                object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
-                                doc.Close(ref saveChanges, ref missing, ref missing);
+                                try
+                                {
+                                    object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
+                                    doc.Close(ref saveChanges, ref missing, ref missing);
+                                }
+                                catch { }
+                                System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
                             }
-                            catch { }
-                            System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
+
+                            processed++;
+                            progress.Report(processed);
                         }
                     }
                 }
-            }
-            finally
-            {
-                if (wordApp != null)
+                finally
                 {
-                    try
+                    if (wordApp != null)
                     {
-                        object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
-                        wordApp.Quit(ref saveChanges, Type.Missing, Type.Missing);
+                        try
+                        {
+                            object saveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
+                            wordApp.Quit(ref saveChanges, Type.Missing, Type.Missing);
+                        }
+                        catch { }
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApp);
                     }
-                    catch { }
-                    System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApp);
                 }
             }
 
-            return totalPages;
+            return result;
         }
 
         private void btnFilesList_Click(object sender, EventArgs e)
@@ -377,6 +391,17 @@ namespace FisiereContorPagini
                 foreach (var f in scannedFiles)
                 {
                     sb.AppendLine($"{f.PageCount}\t{f.FilePath}");
+                }
+
+                if (failedFiles.Count > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine($"Fișiere care au eșuat la citire ({failedFiles.Count}):");
+                    sb.AppendLine("-----\t----");
+                    foreach (var f in failedFiles)
+                    {
+                        sb.AppendLine($"EROARE\t{f.FilePath}\t{f.Message}");
+                    }
                 }
 
                 tb.Text = sb.ToString();

@@ -1,0 +1,17 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio cache/options
+.vs/
+
+# User-specific files
+*.user
+*.suo
+
+# ClickOnce / publish artifacts (no longer used, kept out just in case)
+publish/
+*.publish.xml
+
+# NuGet packages (restored automatically from packages.config)
+packages/
